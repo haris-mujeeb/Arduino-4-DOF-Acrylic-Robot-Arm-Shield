@@ -1,0 +1,5 @@
+SERVO 1  -->   D9   
+SERVO 2  -->   D10
+SERVO 3  -->   D3
+SERVO 4  -->   D11
+ENABLE   -->   D2
