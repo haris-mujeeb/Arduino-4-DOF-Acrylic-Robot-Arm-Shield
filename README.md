@@ -8,41 +8,21 @@ The Arduino shield connects to the Arduino board and provides the following pin 
 
 | Pin Number | Function          | Description                          |
 |------------|-------------------|--------------------------------------|
-| 2          | Servo 1 Control    | Controls the base rotation           |
-| 3          | Servo 2 Control    | Controls the shoulder movement       |
-| 4          | Servo 3 Control    | Controls the elbow movement          |
-| 5          | Servo 4 Control    | Controls the gripper claw           |
-| GND        | Ground             | Common ground connection             |
-| VCC        | Power              | 5V power supply connection           |
+| D9          | Servo 1 Control    | Controls the base rotation           |
+| D10          | Servo 2 Control    | Controls the shoulder movement       |
+| D11          | Servo 3 Control    | Controls the elbow movement          |
+| D3         | Servo 4 Control    | Controls the gripper claw           |
+| D2        | Enable             | Enable all servo motors             |
 
 ---
-
-## Schematic Diagram
-
-![Schematic Diagram](/docs/schematic_diagram.png)
-
-The schematic shows how the servos are connected to the Arduino through the shield, including power and ground connections.
-
----
-
-
-## Block Diagram
-![Block Diagram](/docs/block_diagram.jpg)
-
-The block diagram illustrates the overall architecture of the robot arm system, showing the interaction between the Arduino, the shield, the servos, and the power supply.
-
-## Working
-
-1. **Power Supply**: The shield is powered by a 5V power supply connected to the VCC pin. Ensure that the power supply can handle the current requirements of all servos.
-
-2. **Servo Control**: Each servo motor is controlled by a PWM signal sent from the Arduino. The pinout table above indicates which Arduino pins correspond to each servo.
-
-3. **Arduino Code**: The Arduino code uses the Servo library to control the movement of the robot arm. Each servo is assigned to a specific pin, and the code defines the angles for movement.
-
-4. **Robotic Gripper**: The gripper claw is controlled by the fourth servo, allowing it to open and close to grasp objects.
+## Final Board
+<img src="https://github.com/user-attachments/assets/94d61672-353b-4d17-881a-5043d9a84109" alt="IMG-20251025-WA0018" width="400" />
+<img src="https://github.com/user-attachments/assets/8b99a545-8eb2-4781-97c2-95de9f968b7a" alt="IMG-20251025-WA0017" width="400" />
+<img src="https://github.com/user-attachments/assets/f99d57ff-65df-4117-8323-c3f7e8e6f8e9" alt="IMG-20251025-WA0020" width="400" />
 
 ---
 
 ## License
 
 This project is open source. Feel free to use, modify, and distribute it.
+
