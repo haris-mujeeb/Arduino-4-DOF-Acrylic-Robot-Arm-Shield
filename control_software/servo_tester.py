@@ -19,7 +19,7 @@ except ImportError:
     plt = None
 
 
-# --- 1. ROBOT PHYSICAL PARAMETERS ---
+# --- 1. ROBOT PHYSICAL PARAMETERS (MUST BE ADJUSTED) ---
 # Define your link lengths in millimeters (mm)
 # Measure these precisely on your Keyestudio Arm from joint-center to joint-center.
 L0_Z = 65.0  # Z-height of the shoulder joint (J2) above the base plane (J1)
@@ -42,7 +42,8 @@ COMMAND_DELAY_SEC = 0.05 # Was 0.05, set to 0.03 to match snippet
 
 # --- 3. ANGLE/LIMIT UTILITIES ---
 # Default angles for testing (Base, Shoulder, Elbow, Gripper)
-DEFAULT_HOME_ANGLES = [118, 20, 115, 150]
+DEFAULT_HOME_ANGLES = [25, 0, 60, 180]
+
 
 # --- 4. GLOBAL STATE & SPEED ---
 # Global variable to store the arm's last known angles
@@ -87,7 +88,6 @@ def select_serial_port():
         except ValueError:
             print("Invalid input. Please enter a number or 'quit'.")
 
-
 class ArmIK:
     def __init__(self, L0_Z, L1, L2):
         self.L0_Z = L0_Z
@@ -100,7 +100,6 @@ class ArmIK:
             plt.ion() # Turn on interactive mode for live updates
             self.ax.set_title("4DOF Arm Kinematic Model")
             self._setup_plot_limits()
-
             
     def _setup_plot_limits(self):
         """Sets consistent axis limits based on max reach."""
@@ -113,11 +112,9 @@ class ArmIK:
         self.ax.set_zlabel('Z (mm)')
         self.ax.view_init(elev=30, azim=-60) # Set initial view angle
 
-
     def clamp(self, value, min_val, max_val):
         """Clamps a value within a specified range."""
         return max(min_val, min(max_val, value))
-
 
     def solve_ik(self, x, y, z, grip_angle_deg=90):
         """
@@ -180,6 +177,7 @@ class ArmIK:
              print("IK ERROR: Division by zero during shoulder calculation (Target likely at 0,0,L0_Z).")
              return None
 
+        
         angle_shoulder_rad = beta_rad + alpha_L1_rad
         angle_shoulder_deg = math.degrees(angle_shoulder_rad)
 
@@ -187,7 +185,7 @@ class ArmIK:
         servo_shoulder = int(self.clamp(angle_shoulder_deg, 0, 180))
         
         # --- J4: Gripper Control ---
-        servo_gripper = int(self.clamp(grip_angle_deg, 140, 160))
+        servo_gripper = int(self.clamp(grip_angle_deg, 0, 180))
 
         # Assemble results: [Base, Shoulder, Elbow, Gripper]
         angles = [servo_base, servo_shoulder, servo_elbow, servo_gripper]
@@ -195,7 +193,6 @@ class ArmIK:
         # print(f"\nIK Solved: Base={angles[0]} | Shoulder={angles[1]} | Elbow={angles[2]} | Gripper={angles[3]}")
         
         return angles
-
 
     def forward_kinematics(self, servo_angles):
         """
@@ -205,16 +202,11 @@ class ArmIK:
         
         # Reverse Servo Mappings to get Joint Angles (in radians)
         # J1 (Base)
-        theta1 = math.radians(B_servo - 90.0 - 28.0)
-        print("theta1:", math.degrees(theta1))
+        theta1 = math.radians(B_servo - 90.0)
         # J2 (Shoulder)
-        theta2 = - math.radians(S_servo - 90.0 - 25)
-        print("theta2:", math.degrees(theta2))
+        theta2 = math.radians(S_servo)
         # J3 (Elbow) - Assuming 180 is straight, 0 is fully bent/folded
-        thetaq = - math.radians(E_servo - 25)
-        theta3 = math.radians(90) - theta2 - thetaq
-        print("thetaq:", math.degrees(thetaq))
-        print("theta3:", math.degrees(theta3))
+        theta3 = math.radians(E_servo)
         
         # 1. Base (P0)
         P0 = [0, 0, 0]
@@ -232,6 +224,7 @@ class ArmIK:
         P2 = [P2_x, P2_y, P2_z]
         
         # 4. Wrist/End-Effector (P3) - Position based on P2 and L2 rotated by theta1, (theta2 + theta3)
+        
         # --- KINEMATICS FIX ---
         # The angle of L1 (Shoulder-Elbow) is theta2.
         # The internal angle of L2 (Elbow-Wrist) is theta3 (where 180deg=straight, 0deg=folded).
@@ -249,7 +242,6 @@ class ArmIK:
         P3 = [P3_x, P3_y, P3_z]
         
         return [P0, P1, P2, P3]
-
 
     def visualize_arm(self, joint_coords, target_x=None, target_y=None, target_z=None, title=None):
         """Plots the robot arm links in a 3D matplotlib window."""
@@ -282,7 +274,7 @@ class ArmIK:
             current_title = title
         else:
             current_title = "Arm Kinematic Model"
-        
+            
         self.ax.set_title(current_title)
         
         plt.draw()
@@ -619,8 +611,8 @@ def run_controller():
         time.sleep(2) # Wait for Arduino to reset
         
         # Send initial command to ENABLE and HOME the arm
-        # ser.write(b'H\n')
-        # print("Sent 'H' (Home) command to Arduino.")
+        ser.write(b'H\n')
+        print("Sent 'H' (Home) command to Arduino.")
         
         # --- NEW ---
         # Initialize the global angle state
@@ -640,24 +632,22 @@ def run_controller():
     
     while True:
         try:
-            interactive_joint_mode(ik_solver, ser)
-
-            # # --- MODIFICATION: Added (F)orward Kinematics mode ---
-            # mode = input("\nSelect Mode: (I)nteractive IK, (F)orward Kinematics, (J)oint Sweep, (L)inear Motion, (Q)uit: ")
+            # --- MODIFICATION: Added (F)orward Kinematics mode ---
+            mode = input("\nSelect Mode: (I)nteractive IK, (F)orward Kinematics, (J)oint Sweep, (L)inear Motion, (Q)uit: ")
             
-            # if mode.lower() == 'q':
-            #     break
-            # elif mode.lower() == 'i':
-            #     interactive_ik_mode(ik_solver, ser)
-            # elif mode.lower() == 'f':
-            #     interactive_joint_mode(ik_solver, ser)
-            # elif mode.lower() == 'j':
-            #     test_joint_sweep(ik_solver, ser)
-            # elif mode.lower() == 'l':
-            #     test_linear_motion(ik_solver, ser)
-            # else:
-            #     print("Invalid mode selected. Please choose I, F, J, L, or Q.")
-            # # --- END MODIFICATION ---
+            if mode.lower() == 'q':
+                break
+            elif mode.lower() == 'i':
+                interactive_ik_mode(ik_solver, ser)
+            elif mode.lower() == 'f':
+                interactive_joint_mode(ik_solver, ser)
+            elif mode.lower() == 'j':
+                test_joint_sweep(ik_solver, ser)
+            elif mode.lower() == 'l':
+                test_linear_motion(ik_solver, ser)
+            else:
+                print("Invalid mode selected. Please choose I, F, J, L, or Q.")
+            # --- END MODIFICATION ---
         
         except KeyboardInterrupt:
             print("\nExiting controller.")

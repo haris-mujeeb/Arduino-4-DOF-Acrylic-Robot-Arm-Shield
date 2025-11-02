@@ -49,7 +49,7 @@ void parseAndExecutePosition() {
         arm.goToPosition(angles[0], angles[1], angles[2], angles[3]);
         // Serial.println("ACK"); // Uncomment for host acknowledgement
     } else {
-        Serial.println("ERR: Invalid P command format. Expected P B S E W");
+        Serial.println("ERR: Invalid P command format. Expected \'P<B> <S> <E> <W>\'");
     }
 }
 
@@ -87,7 +87,7 @@ void serialControlBridge() {
                     default:
                         Serial.print("ERR: Unknown command '");
                         Serial.print(command);
-                        Serial.println("'");
+                        Serial.println("\'P<B> <S> <E> <W>\' or \'E\' or \'D\' or \'H\'");
                         break;
                 }
             }

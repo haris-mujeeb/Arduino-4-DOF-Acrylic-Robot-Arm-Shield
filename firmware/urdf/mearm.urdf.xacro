@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<robot name="4dof_arm">
+
+  <!-- Base link -->
+  <link name="base_link"/>
+
+  <!-- Shoulder -->
+  <joint name="joint1_base" type="revolute">
+    <parent link="base_link"/>
+    <child  link="shoulder_link"/>
+    <origin xyz="0 0 0.10" rpy="0 0 0"/> <!-- L0_Z -->
+    <axis xyz="0 0 1"/> <!-- rotates around Z -->
+    <limit lower="-3.14" upper="3.14" effort="5" velocity="2"/>
+  </joint>
+
+  <link name="shoulder_link"/>
+
+  <!-- Upper arm -->
+  <joint name="joint2_shoulder" type="revolute">
+    <parent link="shoulder_link"/>
+    <child  link="upperarm_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.0" upper="2.0" effort="5" velocity="2"/>
+  </joint>
+
+  <link name="upperarm_link">
+    <visual>
+      <geometry><cylinder length="0.15" radius="0.01"/></geometry> <!-- L1 -->
+    </visual>
+  </link>
+
+  <!-- Forearm -->
+  <joint name="joint3_elbow" type="revolute">
+    <parent link="upperarm_link"/>
+    <child  link="forearm_link"/>
+    <origin xyz="0 0 0.15" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.0" upper="2.0" effort="5" velocity="2"/>
+  </joint>
+
+  <link name="forearm_link">
+    <visual>
+      <geometry><cylinder length="0.15" radius="0.01"/></geometry> <!-- L2 -->
+    </visual>
+  </link>
+
+  <!-- Wrist -->
+  <joint name="joint4_wrist" type="revolute">
+    <parent link="forearm_link"/>
+    <child  link="wrist_link"/>
+    <origin xyz="0 0 0.15" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.0" upper="2.0" effort="5" velocity="2"/>
+  </joint>
+
+  <link name="wrist_link"/>
+</robot>
