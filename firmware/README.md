@@ -83,6 +83,7 @@ Link lengths (arm geometry):
 ### Homogeneous Transform Chain
 
 The total end-effector transform:
+
 $$
 T_0^3 = T_0^1 \cdot T_1^2 \cdot T_2^3
 $$
@@ -134,7 +135,13 @@ $$
 ### End-Effector Position
 
 $$
-P = T_0^3 \cdot \begin{bmatrix} 0 \\ 0 \\ 0 \\ 1 \end{bmatrix}
+P = T_0^3 \cdot 
+\begin{bmatrix} 
+0 \\ 
+0 \\ 
+0 \\ 
+1
+\end{bmatrix}
 $$
 
 This gives the arm's precise **(X, Y, Z)** position in 3D space, allowing:
@@ -143,3 +150,27 @@ This gives the arm's precise **(X, Y, Z)** position in 3D space, allowing:
 * Model-based IK
 * External camera / AI control
 * ROS / MoveIt compatibility
+
+## 📐 Dimensions
+
+Accurate measurements of the dimensions are essential for proper calculation of inverse and forward kinematics.
+
+The dimensions of the kit used in the this project are given below.
+
+![Dimensions](https://github.com/rahalnanayakkara/4dof-mearm-robot/blob/main/images/dimensions.jpg)
+
+| Paramter | Value (mm) |
+|:-------:|:---------:|
+| $l_0$ | 0 |
+| $h_1$ | 64 |
+| $l_1$ | 15 |
+| $l_2$ | 80 |
+| $l_3$ | 80 |
+|$l_{3I}$| 35 |
+|$l_{3O}$| 35 |
+| $l_4$ | 80 |
+| $l_5$ | 65 |
+| $d_5$ | 5 |
+
+Before calculating configurations using inverse kinematics, the angles of the servo motors must be verified.
+This can be done by setting all servos to $90^0$ and checking with the given diagram above.
